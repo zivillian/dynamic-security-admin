@@ -235,6 +235,11 @@ namespace Dynsec
 
         Task HandleApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs eventArgs)
         {
+            if (eventArgs.ApplicationMessage.Topic != ResponseTopic)
+            {
+                //not for us - ignore
+                return Task.CompletedTask;
+            }
             var data = eventArgs.ApplicationMessage.Payload;
             var json = JsonNode.Parse(data);
             var responses = json?["responses"]?.AsArray();
