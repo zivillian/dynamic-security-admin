@@ -207,7 +207,7 @@ namespace Dynsec
                     .WithTopicFilter(ResponseTopic)
                     .Build();
                 await _client.SubscribeAsync(subscribeOptions, cancellationToken).ConfigureAwait(false);
-                
+
                 var awaitable = new TaskCompletionSource<JsonNode>(TaskCreationOptions.RunContinuationsAsynchronously);
                 if (!_waitingCalls.TryAdd(command["commands"][0]["command"].GetValue<string>(), awaitable))
                 {
@@ -218,7 +218,7 @@ namespace Dynsec
 
                 using (cancellationToken.Register(() => { awaitable.TrySetCanceled(); }))
                 {
-                    var response =  await awaitable.Task.ConfigureAwait(false);
+                    var response = await awaitable.Task.ConfigureAwait(false);
                     if (response["error"] is not null)
                     {
                         throw new DynsecProtocolException(response["error"].ToString(), response.ToJsonString());
