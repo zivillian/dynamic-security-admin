@@ -82,8 +82,8 @@ namespace Dynsec
         public async Task<string[]> ListGroupsAsync(int count, int offset, CancellationToken cancellationToken)
         {
             var response = await ListAsync("listGroups", false, count, offset, cancellationToken).ConfigureAwait(false);
-            var clients = response["data"]?["groups"];
-            return clients.Deserialize<string[]>();
+            var groups = response["data"]?["groups"];
+            return groups.Deserialize<string[]>();
         }
 
         public Task<Group[]> ListGroupsVerboseAsync(CancellationToken cancellationToken)
@@ -94,8 +94,8 @@ namespace Dynsec
         public async Task<Group[]> ListGroupsVerboseAsync(int count, int offset, CancellationToken cancellationToken)
         {
             var response = await ListAsync("listGroups", true, count, offset, cancellationToken);
-            var clients = response["data"]?["groups"];
-            return clients.Deserialize<Group[]>();
+            var groups = response["data"]?["groups"];
+            return groups.Deserialize<Group[]>();
         }
 
         public Task<string[]> ListRolesAsync(CancellationToken cancellationToken)
@@ -106,8 +106,8 @@ namespace Dynsec
         public async Task<string[]> ListRolesAsync(int count, int offset, CancellationToken cancellationToken)
         {
             var response = await ListAsync("listRoles", false, count, offset, cancellationToken).ConfigureAwait(false);
-            var clients = response["data"]?["roles"];
-            return clients.Deserialize<string[]>();
+            var roles = response["data"]?["roles"];
+            return roles.Deserialize<string[]>();
         }
 
         public Task<Role[]> ListRolesVerboseAsync(CancellationToken cancellationToken)
@@ -118,8 +118,8 @@ namespace Dynsec
         public async Task<Role[]> ListRolesVerboseAsync(int count, int offset, CancellationToken cancellationToken)
         {
             var response = await ListAsync("listRoles", true, count, offset, cancellationToken);
-            var clients = response["data"]?["roles"];
-            return clients.Deserialize<Role[]>();
+            var roles = response["data"]?["roles"];
+            return roles.Deserialize<Role[]>();
         }
 
         public async Task<Client> GetClientAsync(string username, CancellationToken cancellationToken)
@@ -146,12 +146,12 @@ namespace Dynsec
                 ["groupname"] = groupname
             };
             var response = await ExecuteAsync(request, cancellationToken).ConfigureAwait(false);
-            var client = response["data"]?["group"];
-            if (client is null)
+            var group = response["data"]?["group"];
+            if (group is null)
             {
                 throw new DynsecProtocolException("'group' property missing", response.ToJsonString());
             }
-            return client.Deserialize<Group>();
+            return group.Deserialize<Group>();
         }
 
         public async Task<Role> GetRoleAsync(string rolename, CancellationToken cancellationToken)
@@ -162,12 +162,12 @@ namespace Dynsec
                 ["rolename"] = rolename
             };
             var response = await ExecuteAsync(request, cancellationToken).ConfigureAwait(false);
-            var client = response["data"]?["role"];
-            if (client is null)
+            var role = response["data"]?["role"];
+            if (role is null)
             {
                 throw new DynsecProtocolException("'role' property missing", response.ToJsonString());
             }
-            return client.Deserialize<Role>();
+            return role.Deserialize<Role>();
         }
 
         private Task<JsonNode> ListAsync(string command, bool verbose, int count, int offset, CancellationToken cancellationToken)
