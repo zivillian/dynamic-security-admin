@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using Dynsec.DTO;
 using MQTTnet;
 using MQTTnet.Client;
@@ -16,8 +17,9 @@ namespace Dynsec
         private bool _subscribed = false;
         private const string ResponseTopic = "$CONTROL/dynamic-security/v1/response";
         readonly ConcurrentDictionary<string, TaskCompletionSource<JsonNode>> _waitingCalls = new();
+        private readonly JsonSerializerOptions _jsonOptions;
 
-        public DynsecClient(IMqttClient client) : this(client, TimeSpan.FromSeconds(1))
+        public DynsecClient(IMqttClient client) : this(client, TimeSpan.FromSeconds(5))
         {
         }
 
@@ -26,6 +28,10 @@ namespace Dynsec
             _client = client;
             _timeout = timeout;
             _client.ApplicationMessageReceivedAsync += HandleApplicationMessageReceivedAsync;
+            _jsonOptions = new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            };
         }
 
         private ValueTask SubscribeAsync(CancellationToken cancellationToken)
@@ -57,10 +63,6 @@ namespace Dynsec
         {
             return _client.UnsubscribeAsync(ResponseTopic, cancellationToken);
         }
-
-        #region Group
-
-        #endregion
 
         public async Task<Acl[]> GetDefaultAclAccessAsync(CancellationToken cancellationToken)
         {
@@ -136,45 +138,43 @@ namespace Dynsec
 
         public Task ModifyClientAsync(Client client, CancellationToken cancellationToken)
         {
-            var request = JsonSerializer.SerializeToNode(client).AsObject();
+            var request = JsonSerializer.SerializeToNode(client, _jsonOptions).AsObject();
             request["command"] = "modifyClient";
-            request.Remove("disabled");
-            if (client.Roles is null)
-            {
-                request.Remove("roles");
-            }
-            if (client.Groups is null)
-            {
-                request.Remove("groups");
-            }
             return ExecuteAsync(request, cancellationToken);
         }
 
         public Task CreateClientAsync(Client client, CancellationToken cancellationToken)
         {
-            var request = JsonSerializer.SerializeToNode(client).AsObject();
+            var request = JsonSerializer.SerializeToNode(client, _jsonOptions).AsObject();
             request["command"] = "createClient";
-            request.Remove("disabled");
-            if (client.ClientId is null)
+            return ExecuteAsync(request, cancellationToken);
+        }
+
+        public Task AddClientRoleAsync(string username, string rolename, CancellationToken cancellationToken)
+        {
+            return AddClientRoleAsync(username, rolename, -1, cancellationToken);
+        }
+
+        public Task AddClientRoleAsync(string username, string rolename, int priority, CancellationToken cancellationToken)
+        {
+            var request = new JsonObject
             {
-                request.Remove("textname");
-            }
-            if (client.Name is null)
+                ["command"] = "addClientRole",
+                ["username"] = username,
+                ["rolename"] = rolename,
+                ["priority"] = priority
+            };
+            return ExecuteAsync(request, cancellationToken);
+        }
+
+        public Task RemoveClientRoleAsync(string username, string rolename, CancellationToken cancellationToken)
+        {
+            var request = new JsonObject
             {
-                request.Remove("textdescription");
-            }
-            if (client.Description is null)
-            {
-                request.Remove("clientid");
-            }
-            if (client.Roles is null)
-            {
-                request.Remove("roles");
-            }
-            if (client.Groups is null)
-            {
-                request.Remove("groups");
-            }
+                ["command"] = "removeClientRole",
+                ["username"] = username,
+                ["rolename"] = rolename,
+            };
             return ExecuteAsync(request, cancellationToken);
         }
         
@@ -220,6 +220,34 @@ namespace Dynsec
                 throw new DynsecProtocolException("'group' property missing", response.ToJsonString());
             }
             return group.Deserialize<Group>();
+        }
+
+        public Task AddGroupClientAsync(string groupname, string username, CancellationToken cancellationToken)
+        {
+            return AddGroupClientAsync(groupname, username, -1, cancellationToken);
+        }
+
+        public Task AddGroupClientAsync(string groupname, string username, int priority, CancellationToken cancellationToken)
+        {
+            var request = new JsonObject
+            {
+                ["command"] = "addGroupClient",
+                ["groupname"] = groupname,
+                ["username"] = username,
+                ["priority"] = priority
+            };
+            return ExecuteAsync(request, cancellationToken);
+        }
+
+        public Task RemoveGroupClientAsync(string groupname, string username, CancellationToken cancellationToken)
+        {
+            var request = new JsonObject
+            {
+                ["command"] = "removeGroupClient",
+                ["groupname"] = groupname,
+                ["username"] = username,
+            };
+            return ExecuteAsync(request, cancellationToken);
         }
 
         #endregion

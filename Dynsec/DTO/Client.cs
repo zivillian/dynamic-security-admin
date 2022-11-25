@@ -20,7 +20,7 @@ public class Client
     public string? Description { get; set; }
 
     [JsonPropertyName("disabled")]
-    public bool Disabled { get; set; }
+    public bool? Disabled { get; set; }
 
     [JsonPropertyName("roles")]
     public RolePriority[]? Roles { get; set; }
