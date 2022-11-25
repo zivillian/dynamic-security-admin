@@ -11,14 +11,56 @@ namespace Dynsec
     public class DynsecClient:IDisposable
     {
         private readonly IMqttClient _client;
+        private readonly TimeSpan _timeout;
+        private readonly SemaphoreSlim _subscribeLock = new(1, 1);
+        private bool _subscribed = false;
         private const string ResponseTopic = "$CONTROL/dynamic-security/v1/response";
         readonly ConcurrentDictionary<string, TaskCompletionSource<JsonNode>> _waitingCalls = new();
 
-        public DynsecClient(IMqttClient client)
+        public DynsecClient(IMqttClient client) : this(client, TimeSpan.FromSeconds(1))
+        {
+        }
+
+        public DynsecClient(IMqttClient client, TimeSpan timeout)
         {
             _client = client;
+            _timeout = timeout;
             _client.ApplicationMessageReceivedAsync += HandleApplicationMessageReceivedAsync;
         }
+
+        private ValueTask SubscribeAsync(CancellationToken cancellationToken)
+        {
+            if (_subscribed) return ValueTask.CompletedTask;
+            return SubscribeInternalAsync(cancellationToken); 
+        }
+
+        private async ValueTask SubscribeInternalAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                await _subscribeLock.WaitAsync(cancellationToken);
+                if (_subscribed) return;
+
+                var subscribeOptions = new MqttClientSubscribeOptionsBuilder()
+                    .WithTopicFilter(ResponseTopic)
+                    .Build();
+                await _client.SubscribeAsync(subscribeOptions, cancellationToken);
+                _subscribed = true;
+            }
+            finally
+            {
+                _subscribeLock.Release();
+            }
+        }
+
+        public Task UnsubscribeAsync(CancellationToken cancellationToken)
+        {
+            return _client.UnsubscribeAsync(ResponseTopic, cancellationToken);
+        }
+
+        #region Group
+
+        #endregion
 
         public async Task<Acl[]> GetDefaultAclAccessAsync(CancellationToken cancellationToken)
         {
@@ -50,6 +92,8 @@ namespace Dynsec
             return group.Deserialize<Group>();
         }
 
+        #region Client
+
         public Task<string[]> ListClientsAsync(CancellationToken cancellationToken)
         {
             return ListClientsAsync(count: -1, offset: 0, cancellationToken: cancellationToken);
@@ -73,6 +117,70 @@ namespace Dynsec
             var clients = response["data"]?["clients"];
             return clients.Deserialize<Client[]>();
         }
+
+        public async Task<Client> GetClientAsync(string username, CancellationToken cancellationToken)
+        {
+            var request = new JsonObject
+            {
+                ["command"] = "getClient",
+                ["username"] = username
+            };
+            var response = await ExecuteAsync(request, cancellationToken).ConfigureAwait(false);
+            var client = response["data"]?["client"];
+            if (client is null)
+            {
+                throw new DynsecProtocolException("'client' property missing", response.ToJsonString());
+            }
+            return client.Deserialize<Client>();
+        }
+
+        public Task ModifyClientAsync(Client client, CancellationToken cancellationToken)
+        {
+            var request = JsonSerializer.SerializeToNode(client).AsObject();
+            request["command"] = "modifyClient";
+            request.Remove("disabled");
+            if (client.Roles is null)
+            {
+                request.Remove("roles");
+            }
+            if (client.Groups is null)
+            {
+                request.Remove("groups");
+            }
+            return ExecuteAsync(request, cancellationToken);
+        }
+
+        public Task CreateClientAsync(Client client, CancellationToken cancellationToken)
+        {
+            var request = JsonSerializer.SerializeToNode(client).AsObject();
+            request["command"] = "createClient";
+            request.Remove("disabled");
+            if (client.ClientId is null)
+            {
+                request.Remove("textname");
+            }
+            if (client.Name is null)
+            {
+                request.Remove("textdescription");
+            }
+            if (client.Description is null)
+            {
+                request.Remove("clientid");
+            }
+            if (client.Roles is null)
+            {
+                request.Remove("roles");
+            }
+            if (client.Groups is null)
+            {
+                request.Remove("groups");
+            }
+            return ExecuteAsync(request, cancellationToken);
+        }
+        
+        #endregion
+
+        #region Group
 
         public Task<string[]> ListGroupsAsync(CancellationToken cancellationToken)
         {
@@ -98,6 +206,26 @@ namespace Dynsec
             return groups.Deserialize<Group[]>();
         }
 
+        public async Task<Group> GetGroupAsync(string groupname, CancellationToken cancellationToken)
+        {
+            var request = new JsonObject
+            {
+                ["command"] = "getGroup",
+                ["groupname"] = groupname
+            };
+            var response = await ExecuteAsync(request, cancellationToken).ConfigureAwait(false);
+            var group = response["data"]?["group"];
+            if (group is null)
+            {
+                throw new DynsecProtocolException("'group' property missing", response.ToJsonString());
+            }
+            return group.Deserialize<Group>();
+        }
+
+        #endregion
+
+        #region Role
+
         public Task<string[]> ListRolesAsync(CancellationToken cancellationToken)
         {
             return ListRolesAsync(count: -1, offset: 0, cancellationToken: cancellationToken);
@@ -122,38 +250,6 @@ namespace Dynsec
             return roles.Deserialize<Role[]>();
         }
 
-        public async Task<Client> GetClientAsync(string username, CancellationToken cancellationToken)
-        {
-            var request = new JsonObject
-            {
-                ["command"] = "getClient",
-                ["username"] = username
-            };
-            var response = await ExecuteAsync(request, cancellationToken).ConfigureAwait(false);
-            var client = response["data"]?["client"];
-            if (client is null)
-            {
-                throw new DynsecProtocolException("'client' property missing", response.ToJsonString());
-            }
-            return client.Deserialize<Client>();
-        }
-
-        public async Task<Group> GetGroupAsync(string groupname, CancellationToken cancellationToken)
-        {
-            var request = new JsonObject
-            {
-                ["command"] = "getGroup",
-                ["groupname"] = groupname
-            };
-            var response = await ExecuteAsync(request, cancellationToken).ConfigureAwait(false);
-            var group = response["data"]?["group"];
-            if (group is null)
-            {
-                throw new DynsecProtocolException("'group' property missing", response.ToJsonString());
-            }
-            return group.Deserialize<Group>();
-        }
-
         public async Task<Role> GetRoleAsync(string rolename, CancellationToken cancellationToken)
         {
             var request = new JsonObject
@@ -169,6 +265,8 @@ namespace Dynsec
             }
             return role.Deserialize<Role>();
         }
+
+        #endregion
 
         private Task<JsonNode> ListAsync(string command, bool verbose, int count, int offset, CancellationToken cancellationToken)
         {
@@ -201,35 +299,24 @@ namespace Dynsec
                 .WithContentType("application/json")
                 .Build();
 
-            try
+            var awaitable = new TaskCompletionSource<JsonNode>(TaskCreationOptions.RunContinuationsAsynchronously);
+            if (!_waitingCalls.TryAdd(command["commands"][0]["command"].GetValue<string>(), awaitable))
             {
-                var subscribeOptions = new MqttClientSubscribeOptionsBuilder()
-                    .WithTopicFilter(ResponseTopic)
-                    .Build();
-                await _client.SubscribeAsync(subscribeOptions, cancellationToken).ConfigureAwait(false);
-
-                var awaitable = new TaskCompletionSource<JsonNode>(TaskCreationOptions.RunContinuationsAsynchronously);
-                if (!_waitingCalls.TryAdd(command["commands"][0]["command"].GetValue<string>(), awaitable))
-                {
-                    throw new InvalidOperationException();
-                }
-
-                await _client.PublishAsync(requestMessage, cancellationToken).ConfigureAwait(false);
-
-                using (cancellationToken.Register(() => { awaitable.TrySetCanceled(); }))
-                {
-                    var response = await awaitable.Task.ConfigureAwait(false);
-                    if (response["error"] is not null)
-                    {
-                        throw new DynsecProtocolException(response["error"].ToString(), response.ToJsonString());
-                    }
-                    return response;
-                }
+                throw new InvalidOperationException();
             }
-            finally
+            await SubscribeAsync(cancellationToken);
+            await _client.PublishAsync(requestMessage, cancellationToken).ConfigureAwait(false);
+            
+            using var cts = new CancellationTokenSource(_timeout);
+            using var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, cancellationToken);
+            await using (combined.Token.Register(() => { awaitable.TrySetCanceled(); }))
             {
-                // ReSharper disable once MethodSupportsCancellation
-                await _client.UnsubscribeAsync(ResponseTopic).ConfigureAwait(false);
+                var response = await awaitable.Task.ConfigureAwait(false);
+                if (response["error"] is not null)
+                {
+                    throw new DynsecProtocolException(response["error"].ToString(), response.ToJsonString());
+                }
+                return response;
             }
         }
 
