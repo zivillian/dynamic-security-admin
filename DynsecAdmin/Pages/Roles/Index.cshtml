@@ -1,0 +1,21 @@
+﻿@page
+@model DynsecAdmin.Pages.Roles.IndexModel
+@{
+}
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">Rolename</th>
+        <th scope="col">Name</th>
+    </tr>
+    </thead>
+    <tbody>
+        @foreach (var role in Model.Roles.OrderBy(x => x.Rolename))
+        {
+            <tr title="@role.Description">
+                <th scope="row">@role.Rolename</th>
+                <td>@role.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>

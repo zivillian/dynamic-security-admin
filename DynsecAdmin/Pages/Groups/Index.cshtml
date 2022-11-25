@@ -1,0 +1,38 @@
+﻿@page
+@model DynsecAdmin.Pages.Groups.IndexModel
+@{
+}
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">Groupname</th>
+        <th scope="col">Name</th>
+        <th scope="col">Roles</th>
+        <th scope="col">Clients</th>
+    </tr>
+    </thead>
+    <tbody>
+        @foreach (var group in Model.Groups.OrderBy(x => x.Groupname))
+        {
+            <tr title="@group.Description">
+                <th scope="row">@group.Groupname</th>
+                <td>@group.Name</td>
+                <td>
+                    @foreach (var role in group.Roles.OrderBy(x => x.Priority))
+                    {
+                        <a asp-page="../Roles/Edit" asp-route-id="@role.Rolename" class="btn btn-secondary btn-sm position-relative">
+                            @role.Rolename
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" title="Priority: @role.Priority">@role.Priority</span>
+                        </a>
+                    }
+                </td>
+                <td>
+                    @foreach (var client in group.Clients)
+                    {
+                        <span class="badge bg-secondary">@client.Username</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

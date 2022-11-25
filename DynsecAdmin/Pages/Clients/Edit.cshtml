@@ -1,0 +1,151 @@
+﻿@page "{id}/{handler?}/{name?}"
+@model DynsecAdmin.Pages.Clients.EditModel
+@{
+}
+@if (Model.Self)
+{
+    <div class="alert alert-danger" role="alert">
+        You cannot edit yourself.
+    </div>
+}
+<form method="post">
+    <div class="mb-3">
+        <label asp-for="Username"></label>
+        <input type="text" class="form-control" asp-for="Username" readonly/>
+    </div>
+    <div class="mb-3">
+        <label asp-for="ClientId"></label>
+        <input type="text" class="form-control" asp-for="ClientId" readonly="@Model.Self"/>
+        <span asp-validation-for="ClientId" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Password"></label>
+        <input type="password" class="form-control" asp-for="Password" readonly="@Model.Self" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Name"></label>
+        <input type="text" class="form-control" asp-for="Name" readonly="@Model.Self" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Description"></label>
+        <input type="text" class="form-control" asp-for="Description" readonly="@Model.Self" />
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary" disabled="@Model.Self">Save</button>
+</form>
+<div class="row">
+    <div class="col-md-6 ">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Group</th>
+                <th scope="col">Priority</th>
+                <th scope="col" style="width: 1%">
+                        <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addGroupModal" disabled="@Model.Self">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var group in Model.Groups)
+            {
+                <tr>
+                    <td><a asp-page="../Role/Edit" asp-route-id="@group.Groupname">@group.Groupname</a></td>
+                    <td>@group.Priority</td>
+                    <td>
+                            <form method="post" asp-page-handler="DeleteGroup" asp-route-name="@group.Groupname">
+                            <button type="submit" class="btn btn-sm btn-danger" disabled="@Model.Self"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-6 ">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Role</th>
+                <th scope="col">Priority</th>
+                <th scope="col" style="width: 1%">
+                        <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addRoleModal" disabled="@Model.Self">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var role in Model.Roles)
+            {
+                <tr>
+                    <td><a asp-page="../Role/Edit" asp-route-id="@role.Rolename">@role.Rolename</a></td>
+                    <td>@role.Priority</td>
+                    <td>
+                        <form method="post" asp-page-handler="DeleteRole" asp-route-name="@role.Rolename">
+                                <button type="submit" class="btn btn-sm btn-danger" disabled="@Model.Self"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="addGroupModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="AddGroup">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Group</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="groupname">Group</label>
+                        <select class="form-select" name="name" id="groupname" asp-items="Model.AvailableGroups"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="groupPriority">Priority</label>
+                        <input type="number" class="form-control" value="-1" min="-1" id="groupPriority" name="priority"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addRoleModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="AddRole">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Role</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="rolename">Role</label>
+                        <select class="form-select" name="name" id="rolename" asp-items="Model.AvailableRoles"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="rolePriority">Priority</label>
+                        <input type="number" class="form-control" value="-1" min="-1" id="rolePriority" name="priority"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

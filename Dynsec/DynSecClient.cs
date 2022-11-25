@@ -19,7 +19,7 @@ namespace Dynsec
         readonly ConcurrentDictionary<string, TaskCompletionSource<JsonNode>> _waitingCalls = new();
         private readonly JsonSerializerOptions _jsonOptions;
 
-        public DynsecClient(IMqttClient client) : this(client, TimeSpan.FromSeconds(5))
+        public DynsecClient(IMqttClient client) : this(client, TimeSpan.FromSeconds(1))
         {
         }
 

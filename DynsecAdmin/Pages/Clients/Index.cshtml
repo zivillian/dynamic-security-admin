@@ -1,0 +1,46 @@
+﻿@page
+@model DynsecAdmin.Pages.Clients.IndexModel
+@{
+}
+<a asp-page="Add" class="btn btn-success"><i class="bi bi-plus"></i></a>
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">Username</th>
+        <th scope="col">Name</th>
+        <th scope="col">Roles</th>
+        <th scope="col">Groups</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+        @foreach (var client in Model.Clients.OrderBy(x => x.Username))
+        {
+            <tr title="@client.Description">
+                <th scope="row"><a asp-page="Edit" asp-route-id="@client.Username">@client.Username</a></th>
+                <td>@client.Name</td>
+                <td>
+                    @foreach (var role in client.Roles.OrderBy(x=>x.Priority))
+                    {
+                        <span class="badge bg-secondary rounded-pill">
+                            @role.Rolename
+                        </span>
+                    }
+                </td>
+                <td>
+                    @foreach (var group in client.Groups.OrderBy(x=>x.Priority))
+                    {
+                        <span class="badge bg-secondary rounded-pill">
+                            @group.Groupname
+                        </span>
+                    }
+                </td>
+                <td>
+                    <form method="post" asp-page-handler="Delete">
+                        <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i></button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
