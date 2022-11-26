@@ -14,6 +14,7 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
     && dotnet publish -c Release -o out -r $RID --sc -nowarn:IL2026,IL2104 src/DynsecAdmin/DynsecAdmin.csproj
 
 FROM mcr.microsoft.com/dotnet/runtime-deps:6.0-alpine
+EXPOSE 80
 WORKDIR /app
 COPY --from=build-env /app/out .
 
