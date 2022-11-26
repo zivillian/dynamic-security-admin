@@ -16,7 +16,7 @@ namespace DynsecAdmin.Pages.Clients
 
         public string[] _availableRoles { get; set; }
 
-        public bool Self { get; set; }
+        public bool Self => User.IsSelf(Username);
 
         public string Username { get; set; }
 
@@ -58,7 +58,6 @@ namespace DynsecAdmin.Pages.Clients
         {
             try
             {
-                CheckSelf(id);
                 var selectListItems = LoadSelectlistItemsAsync(cancellationToken);
                 var user = await _dynsec.GetClientAsync(id, cancellationToken);
                 Username = user.Username;
@@ -82,7 +81,6 @@ namespace DynsecAdmin.Pages.Clients
             {
                 if (!ModelState.IsValid)
                 {
-                    CheckSelf(id);
                     var selectListItems = LoadSelectlistItemsAsync(cancellationToken);
                     var user = await _dynsec.GetClientAsync(id, cancellationToken);
                     Username = user.Username;
@@ -110,46 +108,31 @@ namespace DynsecAdmin.Pages.Clients
 
         public async Task<IActionResult> OnPostDeleteAsync(string id, CancellationToken cancellationToken)
         {
-            if (!CheckSelf(id))
-            {
-                await _dynsec.DeleteClientAsync(id, cancellationToken);
-            }
+            await _dynsec.DeleteClientAsync(id, cancellationToken);
             return RedirectToPage("Index");
         }
 
         public async Task<IActionResult> OnPostAddGroupAsync(string id, string name, int priority, CancellationToken cancellationToken)
         {
-            if (!CheckSelf(id) && !String.IsNullOrEmpty(name))
-            {
-                await _dynsec.AddGroupClientAsync(name, id, priority, cancellationToken);
-            }
+            await _dynsec.AddGroupClientAsync(name, id, priority, cancellationToken);
             return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostAddRoleAsync(string id, string name, int priority, CancellationToken cancellationToken)
         {
-            if (!CheckSelf(id) && !String.IsNullOrEmpty(name))
-            {
-                await _dynsec.AddClientRoleAsync(id, name, priority, cancellationToken);
-            }
+            await _dynsec.AddClientRoleAsync(id, name, priority, cancellationToken);
             return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostDeleteGroupAsync(string id, string name, CancellationToken cancellationToken)
         {
-            if (!CheckSelf(id))
-            {
-                await _dynsec.RemoveGroupClientAsync(name, id, cancellationToken);
-            }
+            await _dynsec.RemoveGroupClientAsync(name, id, cancellationToken);
             return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostDeleteRoleAsync(string id, string name, CancellationToken cancellationToken)
         {
-            if (!CheckSelf(id))
-            {
-                await _dynsec.RemoveClientRoleAsync(id, name, cancellationToken);
-            }
+            await _dynsec.RemoveClientRoleAsync(id, name, cancellationToken);
             return RedirectToPage();
         }
 
@@ -158,15 +141,6 @@ namespace DynsecAdmin.Pages.Clients
             var rolesTask = _dynsec.ListRolesAsync(cancellationToken);
             _availableGroups = await _dynsec.ListGroupsAsync(cancellationToken);
             _availableRoles = await rolesTask;
-        }
-
-        private bool CheckSelf(string id)
-        {
-            if (id == User.FindFirstValue(ClaimTypes.Upn))
-            {
-                Self = true;
-            }
-            return Self;
         }
     }
 }

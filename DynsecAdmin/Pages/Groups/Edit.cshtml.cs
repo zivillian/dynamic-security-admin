@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using System.Xml.Linq;
 
 namespace DynsecAdmin.Pages.Groups
@@ -14,7 +15,16 @@ namespace DynsecAdmin.Pages.Groups
 
         private string[] _availableClients { get; set; }
 
-        public string[] _availableRoles { get; set; }
+        private string[] _availableRoles { get; set; }
+
+        public bool Self
+        {
+            get
+            {
+                var self = User.FindFirstValue(ClaimTypes.Upn);
+                return Clients.Any(x => x.Username == self);
+            }
+        }
 
         public string Groupname { get; set; }
 
@@ -33,7 +43,7 @@ namespace DynsecAdmin.Pages.Groups
         public IEnumerable<SelectListItem> AvailableClients => _availableClients
             .Where(x => Clients.All(c => c.Username != x))
             .OrderBy(x => x)
-            .Select(x => new SelectListItem(x, x));
+            .Select(x => new SelectListItem(x, x, false, User.IsSelf(x)));
 
         public IEnumerable<SelectListItem> AvailableRoles => _availableRoles
             .Where(x => Roles.All(r => r.Rolename != x))

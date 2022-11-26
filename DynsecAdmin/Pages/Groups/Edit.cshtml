@@ -4,22 +4,28 @@
     ViewData["Title"] = $"Edit {Model.Groupname} group";
 }
 <h1>@ViewData["Title"]</h1>
+@if (Model.Self)
+{
+    <div class="alert alert-danger" role="alert">
+        You cannot edit your own groups.
+    </div>
+}
 <form method="post">
     <div class="mb-3">
         <label asp-for="Groupname"></label>
-        <input type="text" class="form-control" asp-for="Groupname" readonly=""/>
+        <input type="text" class="form-control" asp-for="Groupname" readonly/>
     </div>
     <div class="mb-3">
         <label asp-for="Name"></label>
-        <input type="text" class="form-control" asp-for="Name" />
+        <input type="text" class="form-control" asp-for="Name" readonly="@Model.Self" />
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="Description"></label>
-        <input type="text" class="form-control" asp-for="Description" />
+        <input type="text" class="form-control" asp-for="Description" readonly="@Model.Self" />
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="submit" class="btn btn-primary" disabled="@Model.Self">Save</button>
 </form>
 
 <div class="row">
@@ -43,7 +49,7 @@
                     <td>
                         <form method="post" asp-page-handler="DeleteClient">
                             <input type="hidden" name="name" value="@client.Username" />
-                            <delete-button class="btn btn-sm btn-danger" asp-name="@client.Username"><i class="bi bi-trash"></i></delete-button>
+                            <delete-button class="btn btn-sm btn-danger" asp-name="@client.Username" disabled="@User.IsSelf(client.Username)"><i class="bi bi-trash"></i></delete-button>
                         </form>
                     </td>
                 </tr>
@@ -58,7 +64,7 @@
                 <th scope="col">Role</th>
                 <th scope="col">Priority</th>
                 <th scope="col" style="width: 1%">
-                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addRoleModal">
+                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addRoleModal" disabled="@Model.Self">
                         <i class="bi bi-plus"></i>
                     </button>
                 </th>
@@ -73,7 +79,7 @@
                     <td>
                         <form method="post" asp-page-handler="DeleteRole">
                             <input type="hidden" name="name" value="@role.Rolename" />
-                            <delete-button class="btn btn-sm btn-danger" asp-name="@role.Rolename"><i class="bi bi-trash"></i></delete-button>
+                            <delete-button class="btn btn-sm btn-danger" asp-name="@role.Rolename" disabled="@Model.Self"><i class="bi bi-trash"></i></delete-button>
                         </form>
                     </td>
                 </tr>
