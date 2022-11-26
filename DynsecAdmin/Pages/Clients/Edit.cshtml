@@ -1,7 +1,9 @@
 ﻿@page "{id}/{handler?}"
 @model DynsecAdmin.Pages.Clients.EditModel
 @{
+    ViewData["Title"] = $"Edit {Model.Username} client";
 }
+<h1>@ViewData["Title"]</h1>
 @if (Model.Self)
 {
     <div class="alert alert-danger" role="alert">

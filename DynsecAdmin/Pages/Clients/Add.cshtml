@@ -1,7 +1,9 @@
 ﻿@page
 @model DynsecAdmin.Pages.Clients.AddModel
 @{
+    ViewData["Title"] = "Add client";
 }
+<h1>@ViewData["Title"]</h1>
 <form method="post">
     <div class="mb-3">
         <label asp-for="Username"></label>

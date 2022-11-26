@@ -1,8 +1,10 @@
 ﻿@page
 @model DynsecAdmin.Pages.Roles.IndexModel
 @{
+    ViewData["Title"] = "Roles";
 }
-<a asp-page="Add" class="btn btn-success btn-sm"><i class="bi bi-plus"></i></a>
+<h1>@ViewData["Title"] <a asp-page="Add" class="btn btn-success btn-sm"><i class="bi bi-plus"></i></a></h1>
+
 <table class="table">
     <thead>
     <tr>

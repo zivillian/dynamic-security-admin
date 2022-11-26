@@ -1,8 +1,9 @@
 ﻿@page
 @model DynsecAdmin.Pages.Groups.IndexModel
 @{
+    ViewData["Title"] = "Groups";
 }
-<a asp-page="Add" class="btn btn-success btn-sm"><i class="bi bi-plus"></i></a>
+<h1>@ViewData["Title"] <a asp-page="Add" class="btn btn-success btn-sm"><i class="bi bi-plus"></i></a></h1>
 <table class="table">
     <thead>
     <tr>

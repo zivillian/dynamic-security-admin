@@ -2,7 +2,9 @@
 @using Dynsec.DTO
 @model DynsecAdmin.Pages.Roles.EditModel
 @{
+    ViewData["Title"] = $"Edit {Model.Rolename} role";
 }
+<h1>@ViewData["Title"]</h1>
 <form method="post">
     <div class="mb-3">
         <label asp-for="Rolename"></label>

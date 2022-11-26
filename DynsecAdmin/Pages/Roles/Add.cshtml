@@ -1,7 +1,9 @@
 ﻿@page
 @model DynsecAdmin.Pages.Roles.AddModel
 @{
+    ViewData["Title"] = "Add role";
 }
+<h1>@ViewData["Title"]</h1>
 <form method="post">
     <div class="mb-3">
         <label asp-for="Rolename"></label>

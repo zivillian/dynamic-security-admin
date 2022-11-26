@@ -1,7 +1,9 @@
 ﻿@page
 @model DynsecAdmin.Pages.Groups.AddModel
 @{
+    ViewData["Title"] = "Add group";
 }
+<h1>@ViewData["Title"]</h1>
 <form method="post">
     <div class="mb-3">
         <label asp-for="Groupname"></label>
