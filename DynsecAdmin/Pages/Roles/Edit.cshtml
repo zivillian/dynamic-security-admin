@@ -1,0 +1,106 @@
+﻿@page "{id}/{handler?}"
+@using Dynsec.DTO
+@model DynsecAdmin.Pages.Roles.EditModel
+@{
+}
+<form method="post">
+    <div class="mb-3">
+        <label asp-for="Rolename"></label>
+        <input type="text" class="form-control" asp-for="Rolename" readonly=""/>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Name"></label>
+        <input type="text" class="form-control" asp-for="Name" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Description"></label>
+        <input type="text" class="form-control" asp-for="Description" />
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">Type</th>
+        <th scope="col">Topic</th>
+        <th scope="col">Priority</th>
+        <th scope="col">Allow</th>
+        <th scope="col" style="width: 1%">
+            <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addAclModal">
+                <i class="bi bi-plus"></i>
+            </button>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var acl in Model.Acls)
+    {
+        <tr>
+            <td>@acl.Type</td>
+            <td>@acl.Topic</td>
+            <td>@acl.Priority</td>
+            <td>
+                @if (acl.Allow)
+                {
+                    <i class="bi bi-check-circle text-success"></i>
+                }
+                else
+                {
+                    <i class="bi bi-slash-circle text-danger"></i>
+                }
+            </td>
+            <td>
+                <form method="post" asp-page-handler="DeleteAcl">
+                    <input type="hidden" name="type" value="@acl.Type"/>
+                    <input type="hidden" name="topic" value="@acl.Topic"/>
+                    <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<div class="modal fade" id="addAclModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="AddAcl">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add ACL</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="type">Type</label>
+                        <select class="form-select" name="type" id="type">
+                            <option value="@AclType.PublishClientSend">publishClientSend</option>
+                            <option value="@AclType.PublishClientReceive">publishClientReceive</option>
+                            <option value="@AclType.SubscribeLiteral">subscribeLiteral</option>
+                            <option value="@AclType.SubscribePattern">subscribePattern</option>
+                            <option value="@AclType.UnsubscribeLiteral">unsubscribeLiteral</option>
+                            <option value="@AclType.UnsubscribePattern">unsubscribePattern</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="aclTopic">Topic</label>
+                        <input type="text" class="form-control" id="aclTopic" name="topic" required="required"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="aclPriority">Priority</label>
+                        <input type="number" class="form-control" value="-1" min="-1" id="aclPriority" name="priority" />
+                    </div>
+                    <div class="mb-3">
+                        <input type="checkbox" class="form-check-input" id="aclAllow" name="allow" value="true" checked/>
+                        <label for="aclAllow">allow</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

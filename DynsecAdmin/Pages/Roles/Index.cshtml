@@ -2,19 +2,26 @@
 @model DynsecAdmin.Pages.Roles.IndexModel
 @{
 }
+<a asp-page="Add" class="btn btn-success btn-sm"><i class="bi bi-plus"></i></a>
 <table class="table">
     <thead>
     <tr>
         <th scope="col">Rolename</th>
         <th scope="col">Name</th>
+        <th scope="col" style="width: 1%"></th>
     </tr>
     </thead>
     <tbody>
         @foreach (var role in Model.Roles.OrderBy(x => x.Rolename))
         {
             <tr title="@role.Description">
-                <th scope="row">@role.Rolename</th>
+                <th scope="row"><a asp-page="Edit" asp-route-id="@role.Rolename">@role.Rolename</a></th>
                 <td>@role.Name</td>
+                <td>
+                    <form method="post" asp-page="Edit" asp-page-handler="Delete" asp-route-id="@role.Rolename">
+                        <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+                    </form>
+                </td>
             </tr>
         }
     </tbody>

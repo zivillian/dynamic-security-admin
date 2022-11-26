@@ -8,11 +8,11 @@ public class Role
     public string Rolename { get; set; }
 
     [JsonPropertyName("textname")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     [JsonPropertyName("textdescription")]
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     [JsonPropertyName("acls")]
-    public Acl[] Acls { get; set; }
+    public Acl[]? Acls { get; set; }
 }

@@ -288,6 +288,13 @@ namespace Dynsec
             return roles.Deserialize<Role[]>();
         }
 
+        public Task CreateRoleAsync(Role role, CancellationToken cancellationToken)
+        {
+            var request = JsonSerializer.SerializeToNode(role, _jsonOptions).AsObject();
+            request["command"] = "createRole";
+            return ExecuteAsync(request, cancellationToken);
+        }
+
         public async Task<Role> GetRoleAsync(string rolename, CancellationToken cancellationToken)
         {
             var request = new JsonObject
@@ -302,6 +309,43 @@ namespace Dynsec
                 throw new DynsecProtocolException("'role' property missing", response.ToJsonString());
             }
             return role.Deserialize<Role>();
+        }
+
+        public Task ModifyRoleAsync(Role role, CancellationToken cancellationToken)
+        {
+            var request = JsonSerializer.SerializeToNode(role, _jsonOptions).AsObject();
+            request["command"] = "modifyRole";
+            return ExecuteAsync(request, cancellationToken);
+        }
+
+        public Task DeleteRoleAsync(string rolename, CancellationToken cancellationToken)
+        {
+            var request = new JsonObject
+            {
+                ["command"] = "deleteRole",
+                ["rolename"] = rolename
+            };
+            return ExecuteAsync(request, cancellationToken);
+        }
+
+        public Task AddRoleACLAsync(string rolename, Acl acl, CancellationToken cancellationToken)
+        {
+            var request = JsonSerializer.SerializeToNode(acl, _jsonOptions).AsObject();
+            request["command"] = "addRoleACL";
+            request["rolename"] = rolename;
+            return ExecuteAsync(request, cancellationToken);
+        }
+
+        public Task RemoveRoleACLAsync(string rolename, AclType type, string topic, CancellationToken cancellationToken)
+        {
+            var request = new JsonObject
+            {
+                ["command"] = "removeRoleACL",
+                ["rolename"] = rolename,
+                ["acltype"] = JsonSerializer.SerializeToNode(type, _jsonOptions),
+                ["topic"] = topic,
+            };
+            return ExecuteAsync(request, cancellationToken);
         }
 
         #endregion
