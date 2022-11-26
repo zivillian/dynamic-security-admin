@@ -11,7 +11,7 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
     elif [ "$TARGETARCH" = "arm" ]; then \
     RID=linux-musl-arm ; \
     fi \
-    && dotnet publish -c Release -o out -r $RID --sc -nowarn:IL2026,IL2104 src/DynsecAdmin/DynsecAdmin.csproj
+    && dotnet publish -c Release -o out -r $RID --sc src/DynsecAdmin/DynsecAdmin.csproj
 
 FROM mcr.microsoft.com/dotnet/runtime-deps:6.0-alpine
 EXPOSE 80

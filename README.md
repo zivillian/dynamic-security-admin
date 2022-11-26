@@ -4,7 +4,7 @@ Simple web interface for [mosquitto Dynamic Security](https://mosquitto.org/docu
 
 ## Why?
 
-mosquitto recommends either `mosquitto_ctrl` (which is a commandline app) or the [Management Center for Mosquitto](https://docs.cedalo.com/latest/) which is web based but I had a hard time to get it running and was disappointed that it mirrored all my MQTT messages into my browser with ~40MB/s.
+mosquitto recommends either `mosquitto_ctrl` (which is a commandline app) or the [Management Center for Mosquitto](https://docs.cedalo.com/latest/) which is web based but I had a hard time to get it running and was disappointed that it mirrored all MQTT traffic into my browser with ~40MB/s.
 
 ## How?
 
