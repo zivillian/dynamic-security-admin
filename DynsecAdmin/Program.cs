@@ -20,6 +20,7 @@ builder.Services.AddScoped<DynsecClient>();
 
 var mvcBuilder = builder.Services.AddRazorPages(o =>
 {
+    o.Conventions.AddPageRoute("/Clients/Index", "");
     o.Conventions.AuthorizeFolder("/");
     o.Conventions.AllowAnonymousToPage("/Login");
     o.Conventions.AllowAnonymousToPage("/Index");

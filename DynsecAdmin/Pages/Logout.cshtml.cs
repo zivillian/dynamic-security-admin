@@ -9,7 +9,7 @@ namespace DynsecAdmin.Pages
         public async Task<IActionResult> OnGetAsync()
         {
             await HttpContext.SignOutAsync();
-            return RedirectToPage("/Index");
+            return RedirectToPage("/Login");
         }
     }
 }
