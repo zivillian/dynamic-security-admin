@@ -53,7 +53,7 @@
             @foreach (var group in Model.Groups)
             {
                 <tr>
-                    <td><a asp-page="../Role/Edit" asp-route-id="@group.Groupname">@group.Groupname</a></td>
+                    <td><a asp-page="../Groups/Edit" asp-route-id="@group.Groupname">@group.Groupname</a></td>
                     <td>@group.Priority</td>
                     <td>
                         <form method="post" asp-page-handler="DeleteGroup">
@@ -83,7 +83,7 @@
             @foreach (var role in Model.Roles)
             {
                 <tr>
-                    <td><a asp-page="../Role/Edit" asp-route-id="@role.Rolename">@role.Rolename</a></td>
+                    <td><a asp-page="../Roles/Edit" asp-route-id="@role.Rolename">@role.Rolename</a></td>
                     <td>@role.Priority</td>
                     <td>
                         <form method="post" asp-page-handler="DeleteRole">
