@@ -150,6 +150,16 @@ namespace Dynsec
             return ExecuteAsync(request, cancellationToken);
         }
 
+        public Task DeleteClientAsync(string username, CancellationToken cancellationToken)
+        {
+            var request = new JsonObject
+            {
+                ["command"] = "deleteClient",
+                ["username"] = username
+            };
+            return ExecuteAsync(request, cancellationToken);
+        }
+
         public Task AddClientRoleAsync(string username, string rolename, CancellationToken cancellationToken)
         {
             return AddClientRoleAsync(username, rolename, -1, cancellationToken);

@@ -47,7 +47,7 @@ namespace DynsecAdmin.Pages.Clients
                 Description = Description,
             };
             await client.CreateClientAsync(user, cancellationToken);
-            return RedirectToPage("Index");
+            return RedirectToPage("Edit", new { id = Username });
         }
     }
 }

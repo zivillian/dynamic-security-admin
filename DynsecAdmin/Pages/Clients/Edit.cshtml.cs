@@ -76,19 +76,19 @@ namespace DynsecAdmin.Pages.Clients
 
         public async Task<IActionResult> OnPostAsync(string id, CancellationToken cancellationToken)
         {
-            if (!ModelState.IsValid)
-            {
-                CheckSelf(id);
-                var selectListItems = LoadSelectlistItemsAsync(cancellationToken);
-                var user = await _dynsec.GetClientAsync(id, cancellationToken);
-                Username = user.Username;
-                Roles = user.Roles ?? Array.Empty<RolePriority>();
-                Groups = user.Groups ?? Array.Empty<GroupPriority>();
-                await selectListItems;
-                return Page();
-            }
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    CheckSelf(id);
+                    var selectListItems = LoadSelectlistItemsAsync(cancellationToken);
+                    var user = await _dynsec.GetClientAsync(id, cancellationToken);
+                    Username = user.Username;
+                    Roles = user.Roles ?? Array.Empty<RolePriority>();
+                    Groups = user.Groups ?? Array.Empty<GroupPriority>();
+                    await selectListItems;
+                    return Page();
+                }
                 var client = new Client
                 {
                     Username = id,
@@ -104,6 +104,15 @@ namespace DynsecAdmin.Pages.Clients
             {
                 return NotFound();
             }
+        }
+
+        public async Task<IActionResult> OnPostDeleteAsync(string id, CancellationToken cancellationToken)
+        {
+            if (!CheckSelf(id))
+            {
+                await _dynsec.DeleteClientAsync(id, cancellationToken);
+            }
+            return RedirectToPage("Index");
         }
 
         public async Task<IActionResult> OnPostAddGroupAsync(string id, string name, int priority, CancellationToken cancellationToken)

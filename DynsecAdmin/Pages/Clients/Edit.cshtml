@@ -1,4 +1,4 @@
-﻿@page "{id}/{handler?}/{name?}"
+﻿@page "{id}/{handler?}"
 @model DynsecAdmin.Pages.Clients.EditModel
 @{
 }
@@ -56,7 +56,8 @@
                     <td><a asp-page="../Role/Edit" asp-route-id="@group.Groupname">@group.Groupname</a></td>
                     <td>@group.Priority</td>
                     <td>
-                            <form method="post" asp-page-handler="DeleteGroup" asp-route-name="@group.Groupname">
+                        <form method="post" asp-page-handler="DeleteGroup">
+                            <input type="hidden" name="name" value="@group.Groupname"/>
                             <button type="submit" class="btn btn-sm btn-danger" disabled="@Model.Self"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>
@@ -85,8 +86,9 @@
                     <td><a asp-page="../Role/Edit" asp-route-id="@role.Rolename">@role.Rolename</a></td>
                     <td>@role.Priority</td>
                     <td>
-                        <form method="post" asp-page-handler="DeleteRole" asp-route-name="@role.Rolename">
-                                <button type="submit" class="btn btn-sm btn-danger" disabled="@Model.Self"><i class="bi bi-trash"></i></button>
+                        <form method="post" asp-page-handler="DeleteRole">
+                            <input type="hidden" name="name" value="@role.Rolename" />
+                            <button type="submit" class="btn btn-sm btn-danger" disabled="@Model.Self"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>
                 </tr>
