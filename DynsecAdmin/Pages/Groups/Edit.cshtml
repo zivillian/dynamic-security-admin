@@ -43,7 +43,7 @@
                     <td>
                         <form method="post" asp-page-handler="DeleteClient">
                             <input type="hidden" name="name" value="@client.Username" />
-                            <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                            <delete-button class="btn btn-sm btn-danger" asp-name="@client.Username"><i class="bi bi-trash"></i></delete-button>
                         </form>
                     </td>
                 </tr>
@@ -73,7 +73,7 @@
                     <td>
                         <form method="post" asp-page-handler="DeleteRole">
                             <input type="hidden" name="name" value="@role.Rolename" />
-                            <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                            <delete-button class="btn btn-sm btn-danger" asp-name="@role.Rolename"><i class="bi bi-trash"></i></delete-button>
                         </form>
                     </td>
                 </tr>

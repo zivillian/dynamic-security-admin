@@ -38,7 +38,7 @@
                 </td>
                 <td>
                     <form method="post" asp-page="Edit" asp-page-handler="Delete" asp-route-id="@client.Username">
-                        <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+                        <delete-button class="btn btn-danger btn-sm" asp-name="@client.Username"><i class="bi bi-trash"></i></delete-button>
                     </form>
                 </td>
             </tr>
