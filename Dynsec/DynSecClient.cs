@@ -64,6 +64,11 @@ namespace Dynsec
             return _client.UnsubscribeAsync(ResponseTopic, cancellationToken);
         }
 
+        public async Task SetDefaultAclAccess(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<Acl[]> GetDefaultAclAccessAsync(CancellationToken cancellationToken)
         {
             var request = new JsonObject
@@ -78,23 +83,39 @@ namespace Dynsec
             }
             return acls.Deserialize<Acl[]>();
         }
+        
+        public Task CreateClientAsync(Client client, CancellationToken cancellationToken)
+        {
+            var request = JsonSerializer.SerializeToNode(client, _jsonOptions).AsObject();
+            request["command"] = "createClient";
+            return ExecuteAsync(request, cancellationToken);
+        }
 
-        public async Task<Group> GetAnonymousGroupAsync(CancellationToken cancellationToken)
+        public Task DeleteClientAsync(string username, CancellationToken cancellationToken)
         {
             var request = new JsonObject
             {
-                ["command"] = "getAnonymousGroup"
+                ["command"] = "deleteClient",
+                ["username"] = username
             };
-            var response = await ExecuteAsync(request, cancellationToken).ConfigureAwait(false);
-            var group = response["data"]?["group"];
-            if (group is null)
-            {
-                throw new DynsecProtocolException("'group' property missing", response.ToJsonString());
-            }
-            return group.Deserialize<Group>();
+            return ExecuteAsync(request, cancellationToken);
         }
 
-        #region Client
+        public async Task<Client> GetClientAsync(string username, CancellationToken cancellationToken)
+        {
+            var request = new JsonObject
+            {
+                ["command"] = "getClient",
+                ["username"] = username
+            };
+            var response = await ExecuteAsync(request, cancellationToken).ConfigureAwait(false);
+            var client = response["data"]?["client"];
+            if (client is null)
+            {
+                throw new DynsecProtocolException("'client' property missing", response.ToJsonString());
+            }
+            return client.Deserialize<Client>();
+        }
 
         public Task<string[]> ListClientsAsync(CancellationToken cancellationToken)
         {
@@ -120,43 +141,10 @@ namespace Dynsec
             return clients.Deserialize<Client[]>();
         }
 
-        public async Task<Client> GetClientAsync(string username, CancellationToken cancellationToken)
-        {
-            var request = new JsonObject
-            {
-                ["command"] = "getClient",
-                ["username"] = username
-            };
-            var response = await ExecuteAsync(request, cancellationToken).ConfigureAwait(false);
-            var client = response["data"]?["client"];
-            if (client is null)
-            {
-                throw new DynsecProtocolException("'client' property missing", response.ToJsonString());
-            }
-            return client.Deserialize<Client>();
-        }
-
         public Task ModifyClientAsync(Client client, CancellationToken cancellationToken)
         {
             var request = JsonSerializer.SerializeToNode(client, _jsonOptions).AsObject();
             request["command"] = "modifyClient";
-            return ExecuteAsync(request, cancellationToken);
-        }
-
-        public Task CreateClientAsync(Client client, CancellationToken cancellationToken)
-        {
-            var request = JsonSerializer.SerializeToNode(client, _jsonOptions).AsObject();
-            request["command"] = "createClient";
-            return ExecuteAsync(request, cancellationToken);
-        }
-
-        public Task DeleteClientAsync(string username, CancellationToken cancellationToken)
-        {
-            var request = new JsonObject
-            {
-                ["command"] = "deleteClient",
-                ["username"] = username
-            };
             return ExecuteAsync(request, cancellationToken);
         }
 
@@ -187,33 +175,22 @@ namespace Dynsec
             };
             return ExecuteAsync(request, cancellationToken);
         }
-        
-        #endregion
 
-        #region Group
-
-        public Task<string[]> ListGroupsAsync(CancellationToken cancellationToken)
+        public Task AddGroupClientAsync(string groupname, string username, CancellationToken cancellationToken)
         {
-            return ListGroupsAsync(count: -1, offset: 0, cancellationToken: cancellationToken);
+            return AddGroupClientAsync(groupname, username, -1, cancellationToken);
         }
 
-        public async Task<string[]> ListGroupsAsync(int count, int offset, CancellationToken cancellationToken)
+        public Task AddGroupClientAsync(string groupname, string username, int priority, CancellationToken cancellationToken)
         {
-            var response = await ListAsync("listGroups", false, count, offset, cancellationToken).ConfigureAwait(false);
-            var groups = response["data"]?["groups"];
-            return groups.Deserialize<string[]>();
-        }
-
-        public Task<Group[]> ListGroupsVerboseAsync(CancellationToken cancellationToken)
-        {
-            return ListGroupsVerboseAsync(count: -1, offset: 0, cancellationToken: cancellationToken);
-        }
-
-        public async Task<Group[]> ListGroupsVerboseAsync(int count, int offset, CancellationToken cancellationToken)
-        {
-            var response = await ListAsync("listGroups", true, count, offset, cancellationToken);
-            var groups = response["data"]?["groups"];
-            return groups.Deserialize<Group[]>();
+            var request = new JsonObject
+            {
+                ["command"] = "addGroupClient",
+                ["groupname"] = groupname,
+                ["username"] = username,
+                ["priority"] = priority
+            };
+            return ExecuteAsync(request, cancellationToken);
         }
 
         public Task CreateGroupAsync(Group group, CancellationToken cancellationToken)
@@ -248,28 +225,35 @@ namespace Dynsec
             }
             return group.Deserialize<Group>();
         }
+        
+        public Task<string[]> ListGroupsAsync(CancellationToken cancellationToken)
+        {
+            return ListGroupsAsync(count: -1, offset: 0, cancellationToken: cancellationToken);
+        }
+
+        public async Task<string[]> ListGroupsAsync(int count, int offset, CancellationToken cancellationToken)
+        {
+            var response = await ListAsync("listGroups", false, count, offset, cancellationToken).ConfigureAwait(false);
+            var groups = response["data"]?["groups"];
+            return groups.Deserialize<string[]>();
+        }
+
+        public Task<Group[]> ListGroupsVerboseAsync(CancellationToken cancellationToken)
+        {
+            return ListGroupsVerboseAsync(count: -1, offset: 0, cancellationToken: cancellationToken);
+        }
+
+        public async Task<Group[]> ListGroupsVerboseAsync(int count, int offset, CancellationToken cancellationToken)
+        {
+            var response = await ListAsync("listGroups", true, count, offset, cancellationToken);
+            var groups = response["data"]?["groups"];
+            return groups.Deserialize<Group[]>();
+        }
 
         public Task ModifyGroupAsync(Group group, CancellationToken cancellationToken)
         {
             var request = JsonSerializer.SerializeToNode(group, _jsonOptions).AsObject();
             request["command"] = "modifyGroup";
-            return ExecuteAsync(request, cancellationToken);
-        }
-
-        public Task AddGroupClientAsync(string groupname, string username, CancellationToken cancellationToken)
-        {
-            return AddGroupClientAsync(groupname, username, -1, cancellationToken);
-        }
-
-        public Task AddGroupClientAsync(string groupname, string username, int priority, CancellationToken cancellationToken)
-        {
-            var request = new JsonObject
-            {
-                ["command"] = "addGroupClient",
-                ["groupname"] = groupname,
-                ["username"] = username,
-                ["priority"] = priority
-            };
             return ExecuteAsync(request, cancellationToken);
         }
 
@@ -306,33 +290,20 @@ namespace Dynsec
             };
             return ExecuteAsync(request, cancellationToken);
         }
-
-        #endregion
-
-        #region Role
-
-        public Task<string[]> ListRolesAsync(CancellationToken cancellationToken)
+        
+        public async Task<Group> GetAnonymousGroupAsync(CancellationToken cancellationToken)
         {
-            return ListRolesAsync(count: -1, offset: 0, cancellationToken: cancellationToken);
-        }
-
-        public async Task<string[]> ListRolesAsync(int count, int offset, CancellationToken cancellationToken)
-        {
-            var response = await ListAsync("listRoles", false, count, offset, cancellationToken).ConfigureAwait(false);
-            var roles = response["data"]?["roles"];
-            return roles.Deserialize<string[]>();
-        }
-
-        public Task<Role[]> ListRolesVerboseAsync(CancellationToken cancellationToken)
-        {
-            return ListRolesVerboseAsync(count: -1, offset: 0, cancellationToken: cancellationToken);
-        }
-
-        public async Task<Role[]> ListRolesVerboseAsync(int count, int offset, CancellationToken cancellationToken)
-        {
-            var response = await ListAsync("listRoles", true, count, offset, cancellationToken);
-            var roles = response["data"]?["roles"];
-            return roles.Deserialize<Role[]>();
+            var request = new JsonObject
+            {
+                ["command"] = "getAnonymousGroup"
+            };
+            var response = await ExecuteAsync(request, cancellationToken).ConfigureAwait(false);
+            var group = response["data"]?["group"];
+            if (group is null)
+            {
+                throw new DynsecProtocolException("'group' property missing", response.ToJsonString());
+            }
+            return group.Deserialize<Group>();
         }
 
         public Task CreateRoleAsync(Role role, CancellationToken cancellationToken)
@@ -356,6 +327,30 @@ namespace Dynsec
                 throw new DynsecProtocolException("'role' property missing", response.ToJsonString());
             }
             return role.Deserialize<Role>();
+        }
+        
+        public Task<string[]> ListRolesAsync(CancellationToken cancellationToken)
+        {
+            return ListRolesAsync(count: -1, offset: 0, cancellationToken: cancellationToken);
+        }
+
+        public async Task<string[]> ListRolesAsync(int count, int offset, CancellationToken cancellationToken)
+        {
+            var response = await ListAsync("listRoles", false, count, offset, cancellationToken).ConfigureAwait(false);
+            var roles = response["data"]?["roles"];
+            return roles.Deserialize<string[]>();
+        }
+
+        public Task<Role[]> ListRolesVerboseAsync(CancellationToken cancellationToken)
+        {
+            return ListRolesVerboseAsync(count: -1, offset: 0, cancellationToken: cancellationToken);
+        }
+
+        public async Task<Role[]> ListRolesVerboseAsync(int count, int offset, CancellationToken cancellationToken)
+        {
+            var response = await ListAsync("listRoles", true, count, offset, cancellationToken);
+            var roles = response["data"]?["roles"];
+            return roles.Deserialize<Role[]>();
         }
 
         public Task ModifyRoleAsync(Role role, CancellationToken cancellationToken)
@@ -394,9 +389,7 @@ namespace Dynsec
             };
             return ExecuteAsync(request, cancellationToken);
         }
-
-        #endregion
-
+        
         private Task<JsonNode> ListAsync(string command, bool verbose, int count, int offset, CancellationToken cancellationToken)
         {
             var request = new JsonObject
