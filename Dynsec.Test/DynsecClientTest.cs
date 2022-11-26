@@ -40,9 +40,8 @@ namespace Dynsec.Test
 
             var client = new DynsecClient(mqttClient);
 
-            var response = await client.GetAnonymousGroupAsync(CancellationToken.None);
-            Assert.NotNull(response);
-            Assert.True(String.IsNullOrEmpty(response.Groupname));
+            var group = await client.GetAnonymousGroupAsync(CancellationToken.None);
+            Assert.NotNull(group);
         }
 
         [Fact]
@@ -53,7 +52,7 @@ namespace Dynsec.Test
 
             var client = new DynsecClient(mqttClient);
 
-            var response = await client.ListClientsAsync(cancellationToken:CancellationToken.None);
+            var response = await client.ListClientsAsync(cancellationToken: CancellationToken.None);
             Assert.NotNull(response);
         }
 
@@ -65,7 +64,7 @@ namespace Dynsec.Test
 
             var client = new DynsecClient(mqttClient);
 
-            var response = await client.ListClientsVerboseAsync(cancellationToken:CancellationToken.None);
+            var response = await client.ListClientsVerboseAsync(cancellationToken: CancellationToken.None);
             Assert.NotNull(response);
         }
 
@@ -77,7 +76,7 @@ namespace Dynsec.Test
 
             var client = new DynsecClient(mqttClient);
 
-            var response = await client.GetClientAsync("admin", cancellationToken:CancellationToken.None);
+            var response = await client.GetClientAsync("admin", cancellationToken: CancellationToken.None);
             Assert.NotNull(response);
         }
 
@@ -89,7 +88,7 @@ namespace Dynsec.Test
 
             var client = new DynsecClient(mqttClient);
 
-            var response = await client.ListGroupsAsync(cancellationToken:CancellationToken.None);
+            var response = await client.ListGroupsAsync(cancellationToken: CancellationToken.None);
             Assert.NotNull(response);
         }
 
@@ -101,7 +100,7 @@ namespace Dynsec.Test
 
             var client = new DynsecClient(mqttClient);
 
-            var response = await client.ListGroupsVerboseAsync(cancellationToken:CancellationToken.None);
+            var response = await client.ListGroupsVerboseAsync(cancellationToken: CancellationToken.None);
             Assert.NotNull(response);
         }
 
@@ -113,7 +112,7 @@ namespace Dynsec.Test
 
             var client = new DynsecClient(mqttClient);
 
-            var response = await client.GetGroupAsync("admin", cancellationToken:CancellationToken.None);
+            var response = await client.GetGroupAsync("admin", cancellationToken: CancellationToken.None);
             Assert.NotNull(response);
         }
 
@@ -125,7 +124,7 @@ namespace Dynsec.Test
 
             var client = new DynsecClient(mqttClient);
 
-            var response = await client.ListRolesAsync(cancellationToken:CancellationToken.None);
+            var response = await client.ListRolesAsync(cancellationToken: CancellationToken.None);
             Assert.NotNull(response);
         }
 
@@ -137,7 +136,7 @@ namespace Dynsec.Test
 
             var client = new DynsecClient(mqttClient);
 
-            var response = await client.ListRolesVerboseAsync(cancellationToken:CancellationToken.None);
+            var response = await client.ListRolesVerboseAsync(cancellationToken: CancellationToken.None);
             Assert.NotNull(response);
         }
 
@@ -149,7 +148,7 @@ namespace Dynsec.Test
 
             var client = new DynsecClient(mqttClient);
 
-            var response = await client.GetRoleAsync("admin", cancellationToken:CancellationToken.None);
+            var response = await client.GetRoleAsync("admin", cancellationToken: CancellationToken.None);
             Assert.NotNull(response);
         }
     }

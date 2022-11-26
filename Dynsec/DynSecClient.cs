@@ -348,7 +348,7 @@ namespace Dynsec
             return ExecuteAsync(request, cancellationToken);
         }
 
-        public async Task<Group> GetAnonymousGroupAsync(CancellationToken cancellationToken)
+        public async Task<string> GetAnonymousGroupAsync(CancellationToken cancellationToken)
         {
             var request = new JsonObject
             {
@@ -360,7 +360,7 @@ namespace Dynsec
             {
                 throw new DynsecProtocolException("'group' property missing", response.ToJsonString());
             }
-            return group.Deserialize<Group>();
+            return group["groupname"].GetValue<string>();
         }
 
         public Task CreateRoleAsync(Role role, CancellationToken cancellationToken)

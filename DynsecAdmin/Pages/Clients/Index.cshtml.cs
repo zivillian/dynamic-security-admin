@@ -2,7 +2,6 @@ using Dynsec;
 using Dynsec.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MQTTnet.Client;
 
 namespace DynsecAdmin.Pages.Clients
 {
