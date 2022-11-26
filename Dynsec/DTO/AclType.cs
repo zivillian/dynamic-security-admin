@@ -18,4 +18,8 @@ public enum AclType
     UnsubscribeLiteral,
     [EnumMember(Value = "unsubscribePattern")]
     UnsubscribePattern,
+    [EnumMember(Value = "subscribe")]
+    Subscribe,
+    [EnumMember(Value = "unsubscribe")]
+    Unsubscribe,
 }

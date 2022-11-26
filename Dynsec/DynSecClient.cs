@@ -64,9 +64,14 @@ namespace Dynsec
             return _client.UnsubscribeAsync(ResponseTopic, cancellationToken);
         }
 
-        public async Task SetDefaultAclAccess(CancellationToken cancellationToken)
+        public Task SetDefaultAclAccess(Acl[] acls, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var request = new JsonObject
+            {
+                ["command"] = "setDefaultACLAccess",
+                ["acls"] = JsonSerializer.SerializeToNode(acls, _jsonOptions)
+            };
+            return ExecuteAsync(request, cancellationToken);
         }
 
         public async Task<Acl[]> GetDefaultAclAccessAsync(CancellationToken cancellationToken)
@@ -96,6 +101,26 @@ namespace Dynsec
             var request = new JsonObject
             {
                 ["command"] = "deleteClient",
+                ["username"] = username
+            };
+            return ExecuteAsync(request, cancellationToken);
+        }
+
+        public Task EnableClientAsync(string username, CancellationToken cancellationToken)
+        {
+            var request = new JsonObject
+            {
+                ["command"] = "enableClient",
+                ["username"] = username
+            };
+            return ExecuteAsync(request, cancellationToken);
+        }
+
+        public Task DisableClientAsync(string username, CancellationToken cancellationToken)
+        {
+            var request = new JsonObject
+            {
+                ["command"] = "disableClient",
                 ["username"] = username
             };
             return ExecuteAsync(request, cancellationToken);
@@ -145,6 +170,28 @@ namespace Dynsec
         {
             var request = JsonSerializer.SerializeToNode(client, _jsonOptions).AsObject();
             request["command"] = "modifyClient";
+            return ExecuteAsync(request, cancellationToken);
+        }
+
+        public Task SetClientIdAsync(string username, string clientId, CancellationToken cancellationToken)
+        {
+            var request = new JsonObject
+            {
+                ["command"] = "setClientId",
+                ["username"] = username,
+                ["clientid"] = clientId,
+            };
+            return ExecuteAsync(request, cancellationToken);
+        }
+
+        public Task SetPasswordAsync(string username, string password, CancellationToken cancellationToken)
+        {
+            var request = new JsonObject
+            {
+                ["command"] = "setClientPassword",
+                ["username"] = username,
+                ["password"] = password,
+            };
             return ExecuteAsync(request, cancellationToken);
         }
 
@@ -290,7 +337,17 @@ namespace Dynsec
             };
             return ExecuteAsync(request, cancellationToken);
         }
-        
+
+        public Task SetAnonymousGroup(string groupname, CancellationToken cancellationToken)
+        {
+            var request = new JsonObject
+            {
+                ["command"] = "setAnonymousGroup",
+                ["groupname"] = groupname,
+            };
+            return ExecuteAsync(request, cancellationToken);
+        }
+
         public async Task<Group> GetAnonymousGroupAsync(CancellationToken cancellationToken)
         {
             var request = new JsonObject
