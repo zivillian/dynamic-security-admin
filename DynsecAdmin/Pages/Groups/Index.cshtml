@@ -2,6 +2,7 @@
 @model DynsecAdmin.Pages.Groups.IndexModel
 @{
 }
+<a asp-page="Add" class="btn btn-success btn-sm"><i class="bi bi-plus"></i></a>
 <table class="table">
     <thead>
     <tr>
@@ -9,28 +10,35 @@
         <th scope="col">Name</th>
         <th scope="col">Roles</th>
         <th scope="col">Clients</th>
+        <th scope="col" style="width: 1%"></th>
     </tr>
     </thead>
     <tbody>
         @foreach (var group in Model.Groups.OrderBy(x => x.Groupname))
         {
             <tr title="@group.Description">
-                <th scope="row">@group.Groupname</th>
+                <th scope="row"><a asp-page="Edit" asp-route-id="@group.Groupname">@group.Groupname</a></th>
                 <td>@group.Name</td>
                 <td>
                     @foreach (var role in group.Roles.OrderBy(x => x.Priority))
                     {
-                        <a asp-page="../Roles/Edit" asp-route-id="@role.Rolename" class="btn btn-secondary btn-sm position-relative">
+                        <span class="badge bg-secondary rounded-pill">
                             @role.Rolename
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" title="Priority: @role.Priority">@role.Priority</span>
-                        </a>
+                        </span>
                     }
                 </td>
                 <td>
                     @foreach (var client in group.Clients)
                     {
-                        <span class="badge bg-secondary">@client.Username</span>
+                        <span class="badge bg-secondary rounded-pill">
+                            @client.Username
+                        </span>
                     }
+                </td>
+                <td>
+                    <form method="post" asp-page="Edit" asp-page-handler="Delete" asp-route-id="@group.Groupname">
+                        <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+                    </form>
                 </td>
             </tr>
         }

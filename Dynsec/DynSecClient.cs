@@ -216,6 +216,23 @@ namespace Dynsec
             return groups.Deserialize<Group[]>();
         }
 
+        public Task CreateGroupAsync(Group group, CancellationToken cancellationToken)
+        {
+            var request = JsonSerializer.SerializeToNode(group, _jsonOptions).AsObject();
+            request["command"] = "createGroup";
+            return ExecuteAsync(request, cancellationToken);
+        }
+
+        public Task DeleteGroupAsync(string groupname, CancellationToken cancellationToken)
+        {
+            var request = new JsonObject
+            {
+                ["command"] = "deleteGroup",
+                ["groupname"] = groupname
+            };
+            return ExecuteAsync(request, cancellationToken);
+        }
+
         public async Task<Group> GetGroupAsync(string groupname, CancellationToken cancellationToken)
         {
             var request = new JsonObject
@@ -230,6 +247,13 @@ namespace Dynsec
                 throw new DynsecProtocolException("'group' property missing", response.ToJsonString());
             }
             return group.Deserialize<Group>();
+        }
+
+        public Task ModifyGroupAsync(Group group, CancellationToken cancellationToken)
+        {
+            var request = JsonSerializer.SerializeToNode(group, _jsonOptions).AsObject();
+            request["command"] = "modifyGroup";
+            return ExecuteAsync(request, cancellationToken);
         }
 
         public Task AddGroupClientAsync(string groupname, string username, CancellationToken cancellationToken)
@@ -256,6 +280,29 @@ namespace Dynsec
                 ["command"] = "removeGroupClient",
                 ["groupname"] = groupname,
                 ["username"] = username,
+            };
+            return ExecuteAsync(request, cancellationToken);
+        }
+
+        public Task AddGroupRoleAsync(string groupname, string rolename, int priority, CancellationToken cancellationToken)
+        {
+            var request = new JsonObject
+            {
+                ["command"] = "addGroupRole",
+                ["groupname"] = groupname,
+                ["rolename"] = rolename,
+                ["priority"] = priority,
+            };
+            return ExecuteAsync(request, cancellationToken);
+        }
+
+        public Task RemoveGroupRoleAsync(string groupname, string rolename, CancellationToken cancellationToken)
+        {
+            var request = new JsonObject
+            {
+                ["command"] = "removeGroupRole",
+                ["groupname"] = groupname,
+                ["rolename"] = rolename,
             };
             return ExecuteAsync(request, cancellationToken);
         }

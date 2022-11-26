@@ -41,10 +41,12 @@ namespace DynsecAdmin.Pages.Clients
 
         public IEnumerable<SelectListItem> AvailableGroups => _availableGroups
             .Where(x => Groups.All(g => g.Groupname != x))
+            .OrderBy(x => x)
             .Select(x => new SelectListItem(x, x));
 
         public IEnumerable<SelectListItem> AvailableRoles => _availableRoles
             .Where(x => Roles.All(r => r.Rolename != x))
+            .OrderBy(x => x)
             .Select(x => new SelectListItem(x, x));
 
         public EditModel(DynsecClient dynsec)
@@ -135,7 +137,7 @@ namespace DynsecAdmin.Pages.Clients
 
         public async Task<IActionResult> OnPostDeleteGroupAsync(string id, string name, CancellationToken cancellationToken)
         {
-            if (!CheckSelf(id) && !String.IsNullOrEmpty(name))
+            if (!CheckSelf(id))
             {
                 await _dynsec.RemoveGroupClientAsync(name, id, cancellationToken);
             }
@@ -144,7 +146,7 @@ namespace DynsecAdmin.Pages.Clients
 
         public async Task<IActionResult> OnPostDeleteRoleAsync(string id, string name, CancellationToken cancellationToken)
         {
-            if (!CheckSelf(id) && !String.IsNullOrEmpty(name))
+            if (!CheckSelf(id))
             {
                 await _dynsec.RemoveClientRoleAsync(id, name, cancellationToken);
             }
