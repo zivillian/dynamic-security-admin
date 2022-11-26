@@ -119,7 +119,7 @@ namespace DynsecAdmin.Pages.Clients
         {
             if (!CheckSelf(id) && !String.IsNullOrEmpty(name))
             {
-                await _dynsec.AddGroupClientAsync(id, name, priority, cancellationToken);
+                await _dynsec.AddGroupClientAsync(name, id, priority, cancellationToken);
             }
             return RedirectToPage();
         }
@@ -137,7 +137,7 @@ namespace DynsecAdmin.Pages.Clients
         {
             if (!CheckSelf(id) && !String.IsNullOrEmpty(name))
             {
-                await _dynsec.RemoveGroupClientAsync(id, name, cancellationToken);
+                await _dynsec.RemoveGroupClientAsync(name, id, cancellationToken);
             }
             return RedirectToPage();
         }
