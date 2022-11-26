@@ -3,7 +3,21 @@
 @{
     ViewData["Title"] = $"Edit {Model.Username} client";
 }
-<h1>@ViewData["Title"]</h1>
+<h1>
+    @ViewData["Title"]
+    @if (Model.Disabled)
+    {
+        <form method="post" asp-page-handler="Enable" class="d-inline">
+            <button type="submit" class="btn btn-outline-success btn-sm" title="Enable" disabled="@Model.Self"><i class="bi bi-check-circle"></i></button>
+        </form>
+    }
+    else
+    {
+        <form method="post" asp-page-handler="Disable" class="d-inline">
+            <button type="submit" class="btn btn-outline-danger btn-sm" title="Disable" disabled="@Model.Self"><i class="bi bi-slash-circle"></i></button>
+        </form>
+    }
+</h1>
 @if (Model.Self)
 {
     <div class="alert alert-danger" role="alert">

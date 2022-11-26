@@ -20,6 +20,8 @@ namespace DynsecAdmin.Pages.Clients
 
         public string Username { get; set; }
 
+        public bool Disabled { get; set; }
+
         [BindProperty]
         [Display(Name = "Client ID")]
         public string? ClientId { get; set; }
@@ -62,6 +64,7 @@ namespace DynsecAdmin.Pages.Clients
                 var user = await _dynsec.GetClientAsync(id, cancellationToken);
                 Username = user.Username;
                 ClientId = user.ClientId;
+                Disabled = user.Disabled ?? false;
                 Name = user.Name;
                 Description = user.Description;
                 Roles = user.Roles ?? Array.Empty<RolePriority>();
@@ -104,6 +107,18 @@ namespace DynsecAdmin.Pages.Clients
             {
                 return NotFound();
             }
+        }
+
+        public async Task<IActionResult> OnPostEnableAsync(string id, CancellationToken cancellationToken)
+        {
+            await _dynsec.EnableClientAsync(id, cancellationToken);
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostDisableAsync(string id, CancellationToken cancellationToken)
+        {
+            await _dynsec.DisableClientAsync(id, cancellationToken);
+            return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostDeleteAsync(string id, CancellationToken cancellationToken)
