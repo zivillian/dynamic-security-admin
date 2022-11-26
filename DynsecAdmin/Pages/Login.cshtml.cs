@@ -91,7 +91,7 @@ namespace DynsecAdmin.Pages
 
             if (Url.IsLocalUrl(ReturnUrl))
                 return LocalRedirect(ReturnUrl);
-            return RedirectToPage("/Index");
+            return RedirectToPage("/Clients/Index");
         }
     }
 }
