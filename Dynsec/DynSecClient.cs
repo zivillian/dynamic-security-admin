@@ -144,26 +144,36 @@ namespace Dynsec
 
         public Task<string[]> ListClientsAsync(CancellationToken cancellationToken)
         {
-            return ListClientsAsync(count: -1, offset: 0, cancellationToken: cancellationToken);
+            return ListClientsAsync(count: -1, offset: 0, cancellationToken: cancellationToken)
+                .ContinueWith(x=>x.Result.Items, TaskContinuationOptions.OnlyOnRanToCompletion);
         }
 
-        public async Task<string[]> ListClientsAsync(int count, int offset, CancellationToken cancellationToken)
+        public async Task<ListResponse<string>> ListClientsAsync(int count, int offset, CancellationToken cancellationToken)
         {
             var response = await ListAsync("listClients", false, count, offset, cancellationToken).ConfigureAwait(false);
             var clients = response["data"]?["clients"];
-            return clients.Deserialize<string[]>();
+            return new ListResponse<string>
+            {
+                Items = clients.Deserialize<string[]>(),
+                Total = response["data"]["totalCount"].GetValue<int>()
+            };
         }
 
         public Task<Client[]> ListClientsVerboseAsync(CancellationToken cancellationToken)
         {
-            return ListClientsVerboseAsync(count: -1, offset: 0, cancellationToken: cancellationToken);
+            return ListClientsVerboseAsync(count: -1, offset: 0, cancellationToken: cancellationToken)
+                .ContinueWith(x => x.Result.Items, TaskContinuationOptions.OnlyOnRanToCompletion);
         }
 
-        public async Task<Client[]> ListClientsVerboseAsync(int count, int offset, CancellationToken cancellationToken)
+        public async Task<ListResponse<Client>> ListClientsVerboseAsync(int count, int offset, CancellationToken cancellationToken)
         {
             var response = await ListAsync("listClients", true, count, offset, cancellationToken);
             var clients = response["data"]?["clients"];
-            return clients.Deserialize<Client[]>();
+            return new ListResponse<Client>
+            {
+                Items = clients.Deserialize<Client[]>(),
+                Total = response["data"]["totalCount"].GetValue<int>()
+            };
         }
 
         public Task ModifyClientAsync(Client client, CancellationToken cancellationToken)
@@ -275,26 +285,36 @@ namespace Dynsec
         
         public Task<string[]> ListGroupsAsync(CancellationToken cancellationToken)
         {
-            return ListGroupsAsync(count: -1, offset: 0, cancellationToken: cancellationToken);
+            return ListGroupsAsync(count: -1, offset: 0, cancellationToken: cancellationToken)
+                .ContinueWith(x => x.Result.Items, TaskContinuationOptions.OnlyOnRanToCompletion);
         }
 
-        public async Task<string[]> ListGroupsAsync(int count, int offset, CancellationToken cancellationToken)
+        public async Task<ListResponse<string>> ListGroupsAsync(int count, int offset, CancellationToken cancellationToken)
         {
             var response = await ListAsync("listGroups", false, count, offset, cancellationToken).ConfigureAwait(false);
             var groups = response["data"]?["groups"];
-            return groups.Deserialize<string[]>();
+            return new ListResponse<string>
+            {
+                Items = groups.Deserialize<string[]>(),
+                Total = response["data"]["totalCount"].GetValue<int>()
+            };
         }
 
         public Task<Group[]> ListGroupsVerboseAsync(CancellationToken cancellationToken)
         {
-            return ListGroupsVerboseAsync(count: -1, offset: 0, cancellationToken: cancellationToken);
+            return ListGroupsVerboseAsync(count: -1, offset: 0, cancellationToken: cancellationToken)
+                .ContinueWith(x => x.Result.Items, TaskContinuationOptions.OnlyOnRanToCompletion);
         }
 
-        public async Task<Group[]> ListGroupsVerboseAsync(int count, int offset, CancellationToken cancellationToken)
+        public async Task<ListResponse<Group>> ListGroupsVerboseAsync(int count, int offset, CancellationToken cancellationToken)
         {
             var response = await ListAsync("listGroups", true, count, offset, cancellationToken);
             var groups = response["data"]?["groups"];
-            return groups.Deserialize<Group[]>();
+            return new ListResponse<Group>
+            {
+                Items = groups.Deserialize<Group[]>(),
+                Total = response["data"]["totalCount"].GetValue<int>()
+            };
         }
 
         public Task ModifyGroupAsync(Group group, CancellationToken cancellationToken)
@@ -388,26 +408,36 @@ namespace Dynsec
         
         public Task<string[]> ListRolesAsync(CancellationToken cancellationToken)
         {
-            return ListRolesAsync(count: -1, offset: 0, cancellationToken: cancellationToken);
+            return ListRolesAsync(count: -1, offset: 0, cancellationToken: cancellationToken)
+                .ContinueWith(x => x.Result.Items, TaskContinuationOptions.OnlyOnRanToCompletion);
         }
 
-        public async Task<string[]> ListRolesAsync(int count, int offset, CancellationToken cancellationToken)
+        public async Task<ListResponse<string>> ListRolesAsync(int count, int offset, CancellationToken cancellationToken)
         {
             var response = await ListAsync("listRoles", false, count, offset, cancellationToken).ConfigureAwait(false);
             var roles = response["data"]?["roles"];
-            return roles.Deserialize<string[]>();
+            return new ListResponse<string>
+            {
+                Items = roles.Deserialize<string[]>(),
+                Total = response["data"]["totalCount"].GetValue<int>()
+            };
         }
 
         public Task<Role[]> ListRolesVerboseAsync(CancellationToken cancellationToken)
         {
-            return ListRolesVerboseAsync(count: -1, offset: 0, cancellationToken: cancellationToken);
+            return ListRolesVerboseAsync(count: -1, offset: 0, cancellationToken: cancellationToken)
+                .ContinueWith(x => x.Result.Items, TaskContinuationOptions.OnlyOnRanToCompletion);
         }
 
-        public async Task<Role[]> ListRolesVerboseAsync(int count, int offset, CancellationToken cancellationToken)
+        public async Task<ListResponse<Role>> ListRolesVerboseAsync(int count, int offset, CancellationToken cancellationToken)
         {
             var response = await ListAsync("listRoles", true, count, offset, cancellationToken);
             var roles = response["data"]?["roles"];
-            return roles.Deserialize<Role[]>();
+            return new ListResponse<Role>
+            {
+                Items = roles.Deserialize<Role[]>(),
+                Total = response["data"]["totalCount"].GetValue<int>()
+            };
         }
 
         public Task ModifyRoleAsync(Role role, CancellationToken cancellationToken)
