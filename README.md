@@ -15,4 +15,10 @@ docker run -e MQTTSERVER=<your mqtt server> -p 8080:80 zivillian/dynamic-securit
 
 ## Screenshots?
 
-Will come soon...
+### Defaults
+
+![default group and acl](doc/default.png)
+![list of clients](doc/clients.png)
+![edit client](doc/client.png)
+![edit role](doc/role.png)
+![add acl](doc/add_acl.png)
