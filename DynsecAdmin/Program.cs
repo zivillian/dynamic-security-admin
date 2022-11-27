@@ -24,10 +24,9 @@ var mvcBuilder = builder.Services.AddRazorPages(o =>
     o.Conventions.AllowAnonymousToPage("/Login");
     o.Conventions.AllowAnonymousToPage("/Error");
 });
-if (builder.Environment.IsDevelopment())
-{
+#if DEBUG
     mvcBuilder.AddRazorRuntimeCompilation();
-}
+#endif
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, x =>
