@@ -490,12 +490,23 @@ namespace Dynsec
             using var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, cancellationToken);
             await using (combined.Token.Register(() => { awaitable.TrySetCanceled(); }))
             {
-                var response = await awaitable.Task.ConfigureAwait(false);
-                if (response["error"] is not null)
+                try
                 {
-                    throw new DynsecProtocolException(response["error"].ToString(), response.ToJsonString());
+                    var response = await awaitable.Task.ConfigureAwait(false);
+                    if (response["error"] is not null)
+                    {
+                        throw new DynsecProtocolException(response["error"].ToString(), response.ToJsonString());
+                    }
+                    return response;
                 }
-                return response;
+                catch (OperationCanceledException ex)
+                {
+                    if (cts.IsCancellationRequested)
+                    {
+                        throw new DynsecTimeoutException(_timeout, ex);
+                    }
+                    throw;
+                }
             }
         }
 

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Diagnostics;
+using Dynsec;
+using Microsoft.AspNetCore.Diagnostics;
 
 namespace DynsecAdmin.Pages
 {
@@ -8,20 +9,32 @@ namespace DynsecAdmin.Pages
     [IgnoreAntiforgeryToken]
     public class ErrorModel : PageModel
     {
-        public string? RequestId { get; set; }
+        public string Error { get; set; }
 
-        public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+        public string Message { get; set; }
 
-        private readonly ILogger<ErrorModel> _logger;
-
-        public ErrorModel(ILogger<ErrorModel> logger)
-        {
-            _logger = logger;
-        }
+        public string Hint { get; set; }
 
         public void OnGet()
         {
-            RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            var exceptionFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+
+            if (exceptionFeature?.Error is DynsecProtocolException ex)
+            {
+                Error = ex.Error;
+                Message = ex.Message;
+            }
+            else if (exceptionFeature?.Error is DynsecTimeoutException timeout)
+            {
+                Error = "Timeout";
+                Message = timeout.Message;
+                Hint = "This is probably caused by a modification which affected your current user. In this case, the client is disconnected from the mqtt server to enforce the modified permissions.";
+            }
+        }
+
+        public void OnPost()
+        {
+            OnGet();
         }
     }
 }
