@@ -10,7 +10,7 @@ Simple web interface for [mosquitto Dynamic Security](https://mosquitto.org/docu
 
 Either you know what you are doing, or you just use docker:
 ```bash
-docker run -e MQTTSERVER=<your mqtt server> -p 8080:80 zivillian/dynamic-security-admin:master 
+docker run -e MQTTSERVER=<your mqtt server> -p 8080:80 zivillian/dynamic-security-admin:latest 
 ```
 
 ## Screenshots?
