@@ -1,0 +1,40 @@
+﻿@page
+@model DynsecAdmin.Pages.AccessModel
+@{
+    ViewData["Title"] = "Check access";
+}
+<h1>@ViewData["Title"]</h1>
+<form method="get" class="mb-3">
+    <div class="mb-3">
+        <label asp-for="Topic"></label>
+        <input type="text" class="form-control" asp-for="Topic"/>
+    </div>
+    <button type="submit" class="btn btn-primary">Check access</button>
+</form>
+<div class="alert alert-danger" role="alert">
+    This page currently ignores deny ACLs!
+</div>
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">Rolename</th>
+        <th scope="col">Name</th>
+        <th scope="col">Type</th>
+    </tr>
+    </thead>
+    <tbody>
+        @foreach (var role in Model.Roles.OrderBy(x => x.Rolename))
+        {
+            <tr title="@role.Description">
+                <th><a asp-page="/Roles/Edit" asp-route-id="@role.Rolename">@role.Rolename</a></th>
+                <td>@role.Name</td>
+                <td>
+                    @foreach (var access in role.Access)
+                    {
+                        <span class="badge rounded-pill bg-light text-dark">@access</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
